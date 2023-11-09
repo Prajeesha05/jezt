@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video Recorder</title>
+</head>
+<body>
+    <h2>Video Recorder</h2>
+    <video id="videoElement" width="640" height="480" autoplay></video>
+    <button id="startButton" onclick="startRecording()">Start Recording</button>
+    <button id="stopButton" onclick="stopRecording()" style="display: none;">Stop Recording</button>
+    <button id="saveButton" onclick="saveRecording()" style="display: none;">Save Video</button>
+
+    <script>
+        const videoElement = document.getElementById("videoElement");
+        const startButton = document.getElementById("startButton");
+        const stopButton = document.getElementById("stopButton");
+        const saveButton = document.getElementById("saveButton");
+
+        let mediaRecorder;
+        let recordedChunks = [];
+        let stream;
+
+        async function startRecording() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = stream;
+                mediaRecorder = new MediaRecorder(stream);
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    saveButton.style.display = "inline";
+                    stream.getTracks().forEach((track) => track.stop());
+                };
+
+                startButton.style.display = "none";
+                stopButton.style.display = "inline";
+
+                mediaRecorder.start();
+                setTimeout(() => stopRecording(), 30000); // Record for 30 seconds
+            } catch (error) {
+                console.error("Error accessing webcam:", error);
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                mediaRecorder.stop();
+                startButton.style.display = "inline";
+                stopButton.style.display = "none";
+            }
+        }
+
+        function saveRecording() {
+            const blob = new Blob(recordedChunks, { type: "video/webm" });
+            const videoUrl = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            document.body.appendChild(a);
+            a.style = "display: none";
+            a.href = videoUrl;
+            a.download = "recorded-video.webm";
+            a.click();
+            window.URL.revokeObjectURL(videoUrl);
+        }
+    </script>
+</body>
+</html>

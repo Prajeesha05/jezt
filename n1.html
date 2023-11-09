@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Video Capture and Display</title>
+</head>
+<body>
+    <h1>Live Video Capture and Display</h1>
+
+    <video id="videoElement" width="400" height="300" autoplay></video>
+    <button onclick="captureVideo()">Capture</button>
+
+    <script>
+        var video = document.getElementById('videoElement');
+
+        // Function to capture a snapshot from the live video
+        function captureVideo() {
+            // Create a canvas element to capture the video frame
+            var canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            var context = canvas.getContext('2d');
+
+            // Draw the current frame from the video onto the canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Display the captured image in a new window or perform further processing
+            // For simplicity, we'll just open the image in a new window
+            var capturedImage = new Image();
+            capturedImage.src = canvas.toDataURL('image/png');
+            var newWindow = window.open();
+            newWindow.document.body.appendChild(capturedImage);
+        }
+
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    video.srcObject = stream;
+                })
+                .catch(function (error) {
+                    console.error('Error accessing camera:', error);
+                });
+        } else {
+            console.error('getUserMedia is not supported on this browser');
+        }
+    </script>
+</body>
+</html>

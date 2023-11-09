@@ -1,0 +1,13 @@
+.formcss{
+    height: 150px;
+    width: 300px;
+   
+    border: 1px;
+    padding: 50px 50px 50px 50px;
+    border-radius: 30px;
+    background-color: antiquewhite;
+   
+}
+.sign{
+   margin-top: 150px;
+}
